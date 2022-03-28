@@ -263,3 +263,21 @@ function Board:render()
         end
     end
 end
+
+function Board:isPositionOnBoard(pos)
+    if pos.x < self.x or pos.x > self.x + 32 * 8 then
+        return false
+    end
+
+    if pos.y < self.y or pos.y > self.y + 32 * 8 then
+        return false
+    end
+    
+    return true
+end
+
+function Board:getTileOnPosition(pos)
+    return 
+        math.floor((pos.x - self.x) / 32),
+        math.floor((pos.y - self.y) / 32)
+end

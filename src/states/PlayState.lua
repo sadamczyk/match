@@ -105,8 +105,15 @@ function PlayState:update(dt)
         })
     end
 
-    if self.canInput then
-        -- move cursor around based on bounds of grid, playing sounds
+    -- move cursor around based on bounds of grid, playing sounds
+    if love.mouse.position and self.board:isPositionOnBoard(love.mouse.position) then
+        local oldX, oldY = self.boardHighlightX, self.boardHighlightY
+        self.boardHighlightX, self.boardHighlightY = self.board:getTileOnPosition(love.mouse.position)
+
+        if math.abs(oldX - self.boardHighlightX) > 0 or math.abs(oldY - self.boardHighlightY) > 0 then -- only play sound if value changed
+            gSounds['select']:play()
+        end
+    else
         if love.keyboard.wasPressed('up') then
             self.boardHighlightY = math.max(0, self.boardHighlightY - 1)
             gSounds['select']:play()
@@ -120,9 +127,11 @@ function PlayState:update(dt)
             self.boardHighlightX = math.min(7, self.boardHighlightX + 1)
             gSounds['select']:play()
         end
+    end
 
+    if self.canInput then
         -- if we've pressed enter, to select or deselect a tile...
-        if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
+        if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') or love.mouse.wasPressed(1) then
             
             -- if same tile as currently highlighted, deselect
             local x = self.boardHighlightX + 1
@@ -143,6 +152,8 @@ function PlayState:update(dt)
                 self.highlightedTile = nil
             else
                 
+                self.canInput = false
+
                 -- swap grid positions of tiles
                 local tempX = self.highlightedTile.gridX
                 local tempY = self.highlightedTile.gridY
